@@ -7,11 +7,11 @@ import {
   approveStatus,
   rejectStatus,
   searchUserByServiceNo,
-} from "../services/receiveService";
+} from "../services/receiveService.js";
 import {
   getImageUrl,
   searchReceiverByServiceNo,
-} from "../services/requestService";
+} from "../services/requestService.js";
 import { useToast } from "../components/ToastProvider";
 import { jsPDF } from "jspdf";
 import logoUrl from "../assets/SLTMobitel_Logo.png";

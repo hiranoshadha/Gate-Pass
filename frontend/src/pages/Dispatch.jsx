@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { createStatus, getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/dispatchService';
-import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService';
+import { createStatus, getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/dispatchService.js';
+import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService.js';
 import { jsPDF } from "jspdf";
-import { useToast } from '../components/ToastProvider';
+import { useToast } from '../components/ToastProvider.jsx';
 import logoUrl from '../assets/SLTMobitel_Logo.png';
-import { emailSent } from '../services/emailService';
+import { emailSent } from '../services/emailService.js';
 import {
   FaClock,
   FaEye,

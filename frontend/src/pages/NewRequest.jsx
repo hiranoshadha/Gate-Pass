@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, Link, Navigate } from 'react-router-dom';
 import { Package, MapPin, UserCheck, Send, Edit, Trash2, Plus, FileImage, Info } from 'lucide-react';
-import { searchSenderByServiceNo, createGatePassRequest, getExecutiveOfficers, searchReceiverByServiceNo, getLocations, getCategories } from '../services/requestService';
-import { useToast } from '../components/ToastProvider';
-import { emailSent } from '../services/emailService';
+import { searchSenderByServiceNo, createGatePassRequest, getExecutiveOfficers, searchReceiverByServiceNo, getLocations, getCategories } from '../services/requestService.js';
+import { useToast } from '../components/ToastProvider.jsx';
+import { emailSent } from '../services/emailService.js';
 import { FileSpreadsheet } from 'lucide-react';
 
 const NewRequest = () => {

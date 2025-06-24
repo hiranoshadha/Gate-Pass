@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { emailSent } from '../services/emailService';
+import { emailSent } from '../services/emailService.js';
 
 function EmailForm() {
   const [emailData, setEmailData] = useState({

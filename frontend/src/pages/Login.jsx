@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { authService } from "../services/authService";
+import { authService } from "../services/authService.js";
 import loginImage from "../assets/SLTMobitel_Logo.svg";
 import { motion } from "framer-motion";
-import { useToast } from "../components/ToastProvider";
+import { useToast } from "../components/ToastProvider.jsx";
 
 const Login = () => {
   const [userType, setUserType] = useState("SLT");
