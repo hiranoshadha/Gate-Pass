@@ -66,19 +66,34 @@ const getRejected = async (req, res) => {
 
 const updateApproved = async (req, res) => {
   try {
-    const { comment } = req.body;
+    const { comment, branches } = req.body;
     const { referenceNumber } = req.params;
+
+    // Determine status updates based on branch
+    let statusUpdate = {
+      executiveOfficerStatus: 2,
+      executiveOfficerComment: comment,
+    };
+
+    // Check if user branch is NOT "Colombo - Head Office"
+    if (branches && !branches.includes("Colombo - Head Office")) {
+      statusUpdate = {
+        ...statusUpdate,
+        verifyOfficerStatus: 2,
+        receiveOfficerStatus: 1,
+      };
+    } else {
+      // For "Colombo - Head Office" branch
+      statusUpdate = {
+        ...statusUpdate,
+        verifyOfficerStatus: 1,
+      };
+    }
 
     // Update existing status
     const updatedStatus = await Status.findOneAndUpdate(
       { referenceNumber, executiveOfficerStatus: 1 },
-      {
-        // afterStatus: 2,
-        // comment,
-        executiveOfficerStatus: 2,
-        executiveOfficerComment: comment,
-        verifyOfficerStatus: 1,
-      },
+      statusUpdate,
       { new: true }
     ).populate("request");
 
@@ -86,23 +101,21 @@ const updateApproved = async (req, res) => {
       return res.status(404).json({ message: "Status not found" });
 
     if (updatedStatus.request) {
-      updatedStatus.request.status = 4;
+      // Set different request status based on branch
+      if (branches && !branches.includes("Colombo - Head Office")) {
+        updatedStatus.request.status = 10; // Skip verification, go directly to receive
+      } else {
+        updatedStatus.request.status = 4; // Go to verification
+      }
       await updatedStatus.request.save();
     }
 
-    // const newStatus = new Status({
-    //   referenceNumber,
-    //   request: updatedStatus.request._id,
-    //   beforeStatus: 4,
-    // });
-    // await newStatus.save();
-
-
-     res.status(200).json({ updatedStatus });
+    res.status(200).json({ updatedStatus });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
+
 
 
 const updateRejected = async (req, res) => {

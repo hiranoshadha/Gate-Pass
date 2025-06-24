@@ -7,12 +7,12 @@ import {
   approveStatus,
   rejectStatus,
   searchUserByServiceNo,
-} from "../services/receiveService.js";
+} from "../services/receiveService";
 import {
   getImageUrl,
   searchReceiverByServiceNo,
-} from "../services/requestService.js";
-import { useToast } from "../components/ToastProvider.jsx";
+} from "../services/requestService";
+import { useToast } from "../components/ToastProvider";
 import { jsPDF } from "jspdf";
 import logoUrl from "../assets/SLTMobitel_Logo.png";
 import {
@@ -54,15 +54,37 @@ const Receive = () => {
   const [userDetails, setUserDetails] = useState(null);
   const [staffType, setStaffType] = useState("SLT");
   const [searchedEmployee, setSearchedEmployee] = useState(null);
+  const [user, setUser] = useState(null);
+  const [selectedReturnableItems, setSelectedReturnableItems] = useState([]);
+  const [nonSltStaffDetails, setNonSltStaffDetails] = useState({
+    name: "",
+    companyName: "",
+    nic: "",
+    contactNo: "",
+    email: "",
+  });
   // console.log('selectedItem', selectedItem);
 
   useEffect(() => {
+      const userData = JSON.parse(localStorage.getItem('user'));
+      setUser(userData);
+    }, []);
+
+  useEffect(() => {
     const fetchData = async () => {
+      if (!user || !user.branches) return;
+
       try {
         const data = await getPendingStatuses();
+
+        const filteredData = data.filter(status =>
+          user.branches.includes(status.request?.outLocation)
+        );
+
+        
         // Process each status with async operations
         const formattedData = await Promise.all(
-          data.map(async (status) => {
+          filteredData.map(async (status) => {
             const senderServiceNo = status.request?.employeeServiceNo;
             const receiverServiceNo = status.request?.receiverServiceNo;
             const transportData = status.request?.transport;
@@ -448,7 +470,8 @@ const Receive = () => {
         item.refNo,
         comment,
         unloadingDetails,
-        userDetails.serviceNo
+        userDetails.serviceNo,
+        selectedReturnableItems
       );
 
       // Format the approved item in the same structure as your UI expects
@@ -821,6 +844,10 @@ const Receive = () => {
         showToast={showToast}
         setSearchedEmployee={setSearchedEmployee}
         searchedEmployee={searchedEmployee}
+        selectedReturnableItems={selectedReturnableItems}
+        setSelectedReturnableItems={setSelectedReturnableItems}
+        nonSltStaffDetails={nonSltStaffDetails}
+        setNonSltStaffDetails={setNonSltStaffDetails}
         // user={user}
         // receiver={receiver}
       />
@@ -843,6 +870,8 @@ const RequestDetailsModal = ({
   showToast,
   setSearchedEmployee,
   searchedEmployee,
+  selectedReturnableItems,
+  setSelectedReturnableItems
 }) => {
   console.log("Request", request);
   // Initialize with the correct value from request
@@ -852,7 +881,7 @@ const RequestDetailsModal = ({
   const [selectedItemName, setSelectedItemName] = useState("");
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [currentTab, setCurrentTab] = useState("details");
-  const [selectedReturnableItems, setSelectedReturnableItems] = useState([]);
+  //const [selectedReturnableItems, setSelectedReturnableItems] = useState([]);
   const tabOrder =
     activeTab === "pending"
       ? //? ['details', 'loading', 'transport', 'navigation']
@@ -864,13 +893,7 @@ const RequestDetailsModal = ({
   const [staffType, setStaffType] = useState("SLT");
   const [serviceId, setServiceId] = useState("");
   //const [searchedEmployee, setSearchedEmployee] = useState(null);
-  const [nonSltStaffDetails, setNonSltStaffDetails] = useState({
-    name: "",
-    companyName: "",
-    nic: "",
-    contactNo: "",
-    email: "",
-  });
+  
 
   // States for transportation details
   const [transportStaffType, setTransportStaffType] = useState("SLT");
@@ -930,215 +953,6 @@ const RequestDetailsModal = ({
     if (currentIndex > 0) {
       setCurrentTab(tabOrder[currentIndex - 1]);
     }
-  };
-
-  // Add this function inside the Dispatch component
-  const generatePDF = (request, transporterDetails, loadingStaff) => {
-    const doc = new jsPDF();
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const margin = 20;
-
-    // Add SLT logo (you'll need to replace with actual logo path)
-    // This is a placeholder - you should use an actual image path
-    // Replace with actual logo path
-    try {
-      doc.addImage(logoUrl, "PNG", margin, 10, 40, 20);
-    } catch (error) {
-      console.error("Error adding logo:", error);
-      // Continue without logo if there's an error
-    }
-
-    // Header
-    doc.setFontSize(22);
-    doc.setTextColor(0, 51, 153); // SLT blue color
-    doc.text("SLT Gate Pass", pageWidth / 2, 20, { align: "center" });
-
-    doc.setFontSize(12);
-    doc.setTextColor(100, 100, 100);
-    doc.text(`Reference: ${request.refNo}`, pageWidth / 2, 30, {
-      align: "center",
-    });
-
-    // Add current date
-    const currentDate = new Date().toLocaleDateString();
-    doc.setFontSize(10);
-    doc.text(`Generated on: ${currentDate}`, pageWidth - margin, 20, {
-      align: "right",
-    });
-
-    // Horizontal line
-    doc.setDrawColor(220, 220, 220);
-    doc.line(margin, 35, pageWidth - margin, 35);
-
-    // Sender Details
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Sender Details", margin, 45);
-
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text(`Name: ${request.senderDetails?.name || "N/A"}`, margin, 55);
-    doc.text(
-      `Service No: ${request.senderDetails?.serviceNo || "N/A"}`,
-      margin,
-      62
-    );
-    doc.text(`Section: ${request.senderDetails?.section || "N/A"}`, margin, 69);
-    doc.text(
-      `Group: ${request.senderDetails?.group || "N/A"}`,
-      margin + 80,
-      55
-    );
-    doc.text(
-      `Designation: ${request.senderDetails?.designation || "N/A"}`,
-      margin + 80,
-      62
-    );
-    doc.text(
-      `Contact: ${request.senderDetails?.contactNo || "N/A"}`,
-      margin + 80,
-      69
-    );
-
-    // Location Details
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Location Details", margin, 80);
-
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text(`From: ${request.outLocation || "N/A"}`, margin, 90);
-    doc.text(`To: ${request.inLocation || "N/A"}`, margin + 80, 90);
-
-    // Transport Details
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Transport Details", margin, 105);
-
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text(
-      `Method: ${request?.requestDetails?.transportMethod || "N/A"}`,
-      margin,
-      115
-    );
-    doc.text(`Transporter: ${transporterDetails?.name || "N/A"}`, margin, 122);
-    doc.text(
-      `Service No: ${transporterDetails?.serviceNo || "N/A"}`,
-      margin,
-      129
-    );
-    doc.text(
-      `Contact: ${transporterDetails?.contactNo || "N/A"}`,
-      margin + 80,
-      115
-    );
-    doc.text(
-      `Section: ${transporterDetails?.section || "N/A"}`,
-      margin + 80,
-      122
-    );
-    doc.text(
-      `Vehicle No: ${request?.requestDetails?.vehicleNumber || "N/A"}`,
-      margin + 80,
-      129
-    );
-
-    // Items
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Items", margin, 145);
-
-    // Table header
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-    doc.text("Item Name", margin, 155);
-    doc.text("Serial No", margin + 60, 155);
-    doc.text("Category", margin + 100, 155);
-    doc.text("Status", margin + 140, 155);
-
-    // Table content
-    let yPos = 162;
-    request.items.forEach((item, index) => {
-      if (yPos > 270) {
-        // Add new page if content exceeds page height
-        doc.addPage();
-        yPos = 20;
-
-        // Add table header on new page
-        doc.setFontSize(10);
-        doc.setTextColor(80, 80, 80);
-        doc.text("Item Name", margin, yPos);
-        doc.text("Serial No", margin + 60, yPos);
-        doc.text("Category", margin + 100, yPos);
-        doc.text("Status", margin + 140, yPos);
-
-        yPos += 10;
-      }
-
-      doc.text(item?.itemName || "N/A", margin, yPos);
-      doc.text(item?.serialNo || "N/A", margin + 60, yPos);
-      doc.text(item?.itemCategory || "N/A", margin + 100, yPos);
-      doc.text(
-        item?.itemReturnable ? "Returnable" : "Non-Returnable",
-        margin + 140,
-        yPos
-      );
-
-      yPos += 8;
-    });
-
-    // Approval section
-    yPos += 10;
-    if (yPos > 270) {
-      doc.addPage();
-      yPos = 20;
-    }
-
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0);
-    doc.text("Approval Information", margin, yPos);
-
-    yPos += 10;
-    doc.setFontSize(10);
-    doc.setTextColor(80, 80, 80);
-
-    if (request.comment) {
-      doc.text(`Comment: ${request.comment}`, margin, yPos);
-      yPos += 10;
-    }
-
-    // Signature boxes
-    yPos += 20;
-
-    // Draw signature boxes
-    doc.setDrawColor(150, 150, 150);
-
-    // Security Officer
-    doc.text("Security Officer", margin, yPos);
-    doc.rect(margin, yPos + 5, 50, 20);
-
-    // Dispatch Officer
-    doc.text("Dispatch Officer", margin + 70, yPos);
-    doc.rect(margin + 70, yPos + 5, 50, 20);
-
-    // Receiver
-    doc.text("Receiver", margin + 140, yPos);
-    doc.rect(margin + 140, yPos + 5, 50, 20);
-
-    // Footer
-    const footerYPos = doc.internal.pageSize.getHeight() - 10;
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
-    doc.text(
-      "This is an electronically generated document and does not require signature.",
-      pageWidth / 2,
-      footerYPos,
-      { align: "center" }
-    );
-
-    // Save the PDF
-    doc.save(`SLT_GatePass_${request.refNo}.pdf`);
   };
 
   // Print function

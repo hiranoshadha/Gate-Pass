@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getGatePassRequest, searchReceiverByServiceNo, getImageUrl, getExecutiveOfficers, updateExecutiveOfficer } from '../services/requestService.js';
+import { getGatePassRequest, searchReceiverByServiceNo, getImageUrl, getExecutiveOfficers, updateExecutiveOfficer } from '../services/requestService';
 import { 
   FaClock, 
   FaEye,

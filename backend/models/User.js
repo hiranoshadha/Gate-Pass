@@ -18,6 +18,18 @@ const userSchema = new mongoose.Schema({
     // verifier - Duty officer /Security Officer In-Charge of Premises
     // dispatcher - SLT or Non-SLT Security Officer
     // admin - Executive officer
+    azureId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    isAzureUser: {
+        type: Boolean,
+        default: false
+    },
+    lastAzureSync: {
+        type: Date
+    }
 }, { timestamps: true });
 
 // Add static method for finding users by role

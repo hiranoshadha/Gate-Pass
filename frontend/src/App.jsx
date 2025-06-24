@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Login from "./pages/Login";
+import AzureCallback from './components/AzureCallback';
 import Home from "./pages/Home";
 import ExecutiveApproval from "./pages/ExecutiveApproval";
 import AdminDashboard from "./pages/Admin";
@@ -13,6 +14,7 @@ import Verify from "./pages/Verify";
 import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastProvider } from "./components/ToastProvider";
+import EmailForm from "./pages/Example";
 
 const App = () => {
     return (
@@ -22,6 +24,7 @@ const App = () => {
                 <Routes>
                     {/* Public Routes */}
                     <Route path="/" element={<Login />} />
+                    <Route path="/callback" element={<AzureCallback />} />
 
                     {/* Protected Routes */}
                     <Route element={<ProtectedRoute allowedRoles={["Admin", "SuperAdmin", "User", "Approver", "Verifier", "Pleader", "Dispatcher"]} />}>
@@ -30,6 +33,7 @@ const App = () => {
                         <Route path="/myrequests" element={<GatePassRequests />} />
                         <Route path="/itemTracker" element={<GatePassItemTracker />} />
                         <Route path="/myReceipts" element={<GatePassMyReicept />} />
+                        <Route path="/emailForm" element={<EmailForm />} />
                     </Route>
 
                     {/* Role-Specific Routes */}

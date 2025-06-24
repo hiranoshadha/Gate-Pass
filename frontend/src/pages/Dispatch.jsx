@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
-import { createStatus, getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/dispatchService.js';
-import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService.js';
+import { createStatus, getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/dispatchService';
+import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService';
 import { jsPDF } from "jspdf";
-import { useToast } from '../components/ToastProvider.jsx';
+import { useToast } from '../components/ToastProvider';
 import logoUrl from '../assets/SLTMobitel_Logo.png';
-import { emailSent } from '../services/emailService.js';
+import { emailSent } from '../services/emailService';
 import {
   FaClock,
   FaEye,
@@ -59,6 +59,8 @@ const Dispatch = () => {
       try {
         const data = await getPendingStatuses();
 
+        console.log('Data fetched:', data);
+
         // Filter requests where outLocation matches user's branches
         const filteredData = data.filter(status =>
           user.branches.includes(status.request?.outLocation)
@@ -96,51 +98,51 @@ const Dispatch = () => {
 
           let loadUserData = null;
 
-            if (loadingDetails.staffType === "SLT") {
-              try {
-                const userData = await searchUserByServiceNo(
-                  loadingDetails.staffServiceNo
-                );
-                loadUserData = userData;
-              } catch (error) {
-                console.error(
-                  `Error fetching user for service number ${loadingDetails.staffServiceNo}:`,
-                  error
-                );
-              }
+          if (loadingDetails && loadingDetails.staffType === "SLT") {
+            try {
+              const userData = await searchUserByServiceNo(
+                loadingDetails.staffServiceNo
+              );
+              loadUserData = userData;
+            } catch (error) {
+              console.error(
+                `Error fetching user for service number ${loadingDetails.staffServiceNo}:`,
+                error
+              );
             }
+          }
 
-            let exerctiveOfficerData = null;
+          let exerctiveOfficerData = null;
 
-            if (status.executiveOfficerServiceNo) {
-              try {
-                const userData = await searchUserByServiceNo(
-                  status.executiveOfficerServiceNo
-                );
-                exerctiveOfficerData = userData;
-              } catch (error) {
-                console.error(
-                  `Error fetching user for service number ${status.executiveOfficerServiceNo}:`,
-                  error
-                );
-              }
+          if (status.executiveOfficerServiceNo) {
+            try {
+              const userData = await searchUserByServiceNo(
+                status.executiveOfficerServiceNo
+              );
+              exerctiveOfficerData = userData;
+            } catch (error) {
+              console.error(
+                `Error fetching user for service number ${status.executiveOfficerServiceNo}:`,
+                error
+              );
             }
+          }
 
-            let verifyOfficerData = null;
+          let verifyOfficerData = null;
 
-            if (status.verifyOfficerServiceNumber) {
-              try {
-                const userData = await searchUserByServiceNo(
-                  status.verifyOfficerServiceNumber
-                );
-                verifyOfficerData = userData;
-              } catch (error) {
-                console.error(
-                  `Error fetching user for service number ${status.verifyOfficerServiceNumber}:`,
-                  error
-                );
-              }
+          if (status.verifyOfficerServiceNumber) {
+            try {
+              const userData = await searchUserByServiceNo(
+                status.verifyOfficerServiceNumber
+              );
+              verifyOfficerData = userData;
+            } catch (error) {
+              console.error(
+                `Error fetching user for service number ${status.verifyOfficerServiceNumber}:`,
+                error
+              );
             }
+          }
 
           return {
             refNo: status.referenceNumber,

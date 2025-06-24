@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { createStatus, getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/verifyService.js';
-import { getUserByRoleAndBranch } from '../services/userManagementService.js';
-import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService.js';
-import { useToast } from '../components/ToastProvider.jsx';
-import { emailSent } from '../services/emailService.js';
+//import { getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/verifyService.js';
+import { getUserByRoleAndBranch } from '../services/userManagementService';
+import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService';
+import { useToast } from '../components/ToastProvider';
+import { emailSent } from '../services/emailService';
 import { jsPDF } from "jspdf";
 import logoUrl from '../assets/SLTMobitel_Logo.png';
 import { useLocation } from 'react-router-dom';

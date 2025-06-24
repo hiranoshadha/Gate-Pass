@@ -15,7 +15,8 @@ const getUserByServiceNo = async (req, res) => {
             group: user.group,
             contactNo: user.contactNo,
             role: user.role,
-            email: user.email
+            email: user.email,
+            branches: user.branches
         };
         res.status(200).json(userData);
     } catch (error) {

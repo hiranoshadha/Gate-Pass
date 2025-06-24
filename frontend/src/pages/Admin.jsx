@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { adminService } from '../services/adminService.js';
+import { adminService } from '../services/adminService';
 import { FaPlus, FaUpload, FaMapMarkerAlt, FaTag, FaFileUpload, FaChartBar, FaUsers, FaHistory, FaCog } from 'react-icons/fa';
-import UserManagement from './UserManagement.jsx';
+import UserManagement from './UserManagement';
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('manage');

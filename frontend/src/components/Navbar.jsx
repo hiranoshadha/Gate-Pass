@@ -40,7 +40,7 @@ const Navbar = () => {
           { title: "My Request", path: "/myrequests" },
           { title: "Executive Approve", path: "/executiveApproval" },
           { title: "Verify", path: "/verify" },
-          { title: "Pleader", path: "/dispatch" },
+          { title: "Petrol leader", path: "/dispatch" },
           { title: "Receive", path: "/receive" },
           { title: "My Receipt", path: "/myReceipts" },
           { title: "Item Tracker", path: "/itemTracker" },
@@ -53,7 +53,7 @@ const Navbar = () => {
           { title: "My Request", path: "/myrequests" },
           { title: "Executive Approve", path: "/executiveApproval" },
           { title: "Verify", path: "/verify" },
-          { title: "Pleader", path: "/dispatch" },
+          { title: "Petrol leader", path: "/dispatch" },
           { title: "Receive", path: "/receive" },
           { title: "My Receipt", path: "/myReceipts" },
           { title: "Item Tracker", path: "/itemTracker" },
@@ -84,7 +84,7 @@ const Navbar = () => {
         return [
           { title: "New Request", path: "/newrequest" },
           { title: "My Request", path: "/myrequests" },
-          { title: "Pleader", path: "/dispatch" },
+          { title: "Petrol leader", path: "/dispatch" },
           { title: "Item Tracker", path: "/itemTracker" },
         ];
         case "Dispatcher":

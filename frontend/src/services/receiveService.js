@@ -44,9 +44,9 @@ export const getRejectedStatuses = async () => {
 };  
 
 // Approve a request (update status)
-export const approveStatus = async (referenceNumber, comment, unloadingDetails, userServiceNumber) => {
+export const approveStatus = async (referenceNumber, comment, unloadingDetails, userServiceNumber, returnableItems) => {
     try {
-      const response = await axios.put(`${API_BASE_URL}/receive/${referenceNumber}/approve`, { comment, unloadingDetails, userServiceNumber });
+      const response = await axios.put(`${API_BASE_URL}/receive/${referenceNumber}/approve`, { comment, unloadingDetails, userServiceNumber, returnableItems });
       return response.data;
     } catch (error) {
       console.error('Error approving status:', error);

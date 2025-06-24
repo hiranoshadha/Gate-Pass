@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo} from '../services/approveService.js';
-import { getImageUrl, searchReceiverByServiceNo} from '../services/requestService.js';
-import { useToast } from '../components/ToastProvider.jsx';
-import { emailSent } from '../services/emailService.js';
+import {createStatus, getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo} from '../services/approveService';
+import { getImageUrl, searchReceiverByServiceNo, getGatePassRequest } from '../services/requestService';
+import { useToast } from '../components/ToastProvider';
+import { emailSent } from '../services/emailService';
 import { FaSearch } from 'react-icons/fa';
 import { jsPDF } from "jspdf";
 import logoUrl from '../assets/SLTMobitel_Logo.png';
@@ -34,6 +34,7 @@ const ExecutiveApproval = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     const user = JSON.parse(localStorage.getItem('user'));
+    console.log("User:", user);
     
 
     useEffect(() => {
@@ -244,7 +245,7 @@ const ExecutiveApproval = () => {
     const handleApprove = async (item) => {
       try {
         // Call API to approve status with comment
-        const updatedStatus = await approveStatus(item.refNo, comment);
+        const updatedStatus = await approveStatus(item.refNo, comment, item.senderDetails.branches);
         
         // Format the approved item in the same structure as your UI expects
         const approvedItem = {
@@ -638,7 +639,7 @@ const sendRejectionEmail = async (request, comment) => {
 };
 
 const RequestDetailsModal = ({ isOpen, onClose, request, user, receiver, activeTab, comment, setComment, handleApprove, handleReject, transporterDetails }) => {
-   //console.log("Request", request);
+   console.log("Request", request);
   //console.log("transporterDetails", transporterDetails)
   // Initialize with the correct value from request
   const [selectedExecutive, setSelectedExecutive] = useState('');
