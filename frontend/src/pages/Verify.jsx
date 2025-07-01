@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-//import { getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/verifyService.js';
+import { getPendingStatuses, getApprovedStatuses, getRejectedStatuses, approveStatus, rejectStatus, searchUserByServiceNo } from '../services/verifyService.js';
 import { getUserByRoleAndBranch } from '../services/userManagementService.js';
 import { getImageUrl, searchReceiverByServiceNo } from '../services/requestService.js';
 import { useToast } from '../components/ToastProvider.jsx';
@@ -61,6 +61,7 @@ const Verify = () => {
     const fetchData = async () => {
       try {
         const data = await getPendingStatuses();
+        console.log('Pending Statuses:', data);
         // Process each status with async operations
         const formattedData = await Promise.all(data.map(async (status) => {
           //console.log('status', status);

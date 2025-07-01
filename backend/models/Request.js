@@ -52,7 +52,7 @@ const RequestSchema = new mongoose.Schema({
     inLocation: { type: String, required: true },
     executiveOfficerServiceNo: { type: String, required: true },
     receiverAvailable: { type: Boolean, required: true },
-    status: { type: Number, enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], default: 1 },
+    status: { type: Number, enum: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], default: 1 },
     // 1: Executive Pending 
     // 2: Executive Approved 
     // 3: Executive Rejected 
@@ -65,6 +65,7 @@ const RequestSchema = new mongoose.Schema({
     // 10: Received Pending
     // 11: Received Approved
     // 12: Received Rejected
+    // 13: Canceled
     receiverServiceNo: { type: String },
     transport: TransportSchema,
     loading: LoadingSchema,
@@ -77,7 +78,7 @@ const RequestSchema = new mongoose.Schema({
             itemModel: String,
         }
     ],
-
+    show: { type: Boolean, default: true },
     createdAt: { type: Date, default: Date.now }
 }, { timestamps: true });
 

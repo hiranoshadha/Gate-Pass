@@ -17,7 +17,8 @@ const {
     getRequestsByStatus,
     getRequestsByItemReturnable,
     getRequestsByReceiverAvailable,
-    updateExecutiveOfficer
+    updateExecutiveOfficer,
+    cancelRequest
 } = require('../controllers/requestController');
 
 router.post('/', protect, upload.array('itemPhotos'), createRequest);
@@ -31,6 +32,7 @@ router.get('/status/:status', protect, getRequestsByStatus);
 router.get('/filter/returnable/:returnable', protect, getRequestsByItemReturnable);
 router.get('/filter/receiver/:available', protect, getRequestsByReceiverAvailable);
 router.patch('/:id/executive', protect, updateExecutiveOfficer);
+router.patch('/:referenceNumber/cancel', cancelRequest);
 // router.get('/itemTracking', getRequestForItemTracking);
 
 

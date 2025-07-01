@@ -138,3 +138,19 @@ export const getCategories = async () => {
     }
 };
 
+export const cancelRequest = async (referenceNumber) => {
+    try {
+        const token = localStorage.getItem('token');
+        const response = await axios.patch(`${API_BASE_URL}/requests/${referenceNumber}/cancel`, {}, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error canceling request:', error);
+        throw error;
+    }
+};
+
+

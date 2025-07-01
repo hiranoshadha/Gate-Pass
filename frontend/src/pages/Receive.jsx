@@ -11,8 +11,8 @@ import {
 import {
   getImageUrl,
   searchReceiverByServiceNo,
-} from "../services/requestService.js";
-import { useToast } from "../components/ToastProvider";
+} from "../services/requestService";
+import { useToast } from "../components/ToastProvider.jsx";
 import { jsPDF } from "jspdf";
 import logoUrl from "../assets/SLTMobitel_Logo.png";
 import {

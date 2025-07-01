@@ -1,6 +1,6 @@
 const Request = require('../models/Request');
 const Status = require('../models/Status');
-const {uploadImage, getImage}  = require('../utils/imageUpload');
+const { uploadImage, getImage } = require('../utils/imageUpload');
 
 const createRequest = async (req, res) => {
     try {
@@ -14,12 +14,12 @@ const createRequest = async (req, res) => {
             vehicleNumber,
             vehicleModel } = req.body;
 
-            
 
-        
+
+
         const referenceNumber = `REQ-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
         const parsedItems = JSON.parse(items);
-        
+
         // Create a map to group files by their original names
         // const fileMap = {};
         // req.files.forEach(file => {
@@ -31,8 +31,8 @@ const createRequest = async (req, res) => {
 
         // const processedItems = await Promise.all(parsedItems.map(async (item) => {
         //     const itemPhotos = [];
-            
-            
+
+
         //     // Process photos for this specific item only
         //     for (const fileName of item.originalFileNames) {
         //         const file = fileMap[fileName];
@@ -41,7 +41,7 @@ const createRequest = async (req, res) => {
         //             itemPhotos.push(uploadedImage);
         //         }
         //     }
-            
+
         //     return {
         //         itemName: item.itemName,
         //         serialNo: item.serialNo,
@@ -68,14 +68,14 @@ const createRequest = async (req, res) => {
             const transportData = {
                 transportMethod
             };
-            
-            
 
-            
-            
+
+
+
+
             if (transportMethod === 'Vehicle') {
                 transportData.transporterType = transporterType;
-                
+
                 if (transporterType === 'SLT') {
                     transportData.transporterServiceNo = transporterServiceNo;
                 } else {
@@ -84,13 +84,13 @@ const createRequest = async (req, res) => {
                     transportData.nonSLTTransporterPhone = nonSLTTransporterPhone;
                     transportData.nonSLTTransporterEmail = nonSLTTransporterEmail;
                 }
-                
+
                 transportData.vehicleNumber = vehicleNumber;
                 transportData.vehicleModel = vehicleModel;
             }
             if (transportMethod === 'By Hand') {
                 transportData.transporterType = transporterType;
-                
+
                 if (transporterType === 'SLT') {
                     transportData.transporterServiceNo = transporterServiceNo;
                 } else {
@@ -99,14 +99,14 @@ const createRequest = async (req, res) => {
                     transportData.nonSLTTransporterPhone = nonSLTTransporterPhone;
                     transportData.nonSLTTransporterEmail = nonSLTTransporterEmail;
                 }
-                
+
                 transportData.vehicleNumber = vehicleNumber;
                 transportData.vehicleModel = vehicleModel;
             }
             requestData.transport = transportData;
         }
 
-        
+
 
 
         const request = await Request.create(requestData);
@@ -117,9 +117,9 @@ const createRequest = async (req, res) => {
             executiveOfficerServiceNo,
             executiveOfficerStatus: 1,
             // beforeStatus: 1,
-            request: request._id, 
+            request: request._id,
         });
-        
+
         await newStatus.save();
 
         res.status(201).json({
@@ -137,39 +137,39 @@ const processCSVItems = async (csvItems, files) => {
     // Create a map to group files by their original names if files exist
     const fileMap = {};
     if (files && files.length > 0) {
-      files.forEach(file => {
-        fileMap[file.originalname] = file;
-      });
+        files.forEach(file => {
+            fileMap[file.originalname] = file;
+        });
     }
-  
+
     return Promise.all(csvItems.map(async (item) => {
-      const itemPhotos = [];
-      
-      // Process photos for this specific item if they exist
-      if (item.originalFileNames && item.originalFileNames.length > 0) {
-        for (const fileName of item.originalFileNames) {
-          const file = fileMap[fileName];
-          if (file) {
-            const uploadedImage = await uploadImage(file, 'items');
-            itemPhotos.push(uploadedImage);
-          }
+        const itemPhotos = [];
+
+        // Process photos for this specific item if they exist
+        if (item.originalFileNames && item.originalFileNames.length > 0) {
+            for (const fileName of item.originalFileNames) {
+                const file = fileMap[fileName];
+                if (file) {
+                    const uploadedImage = await uploadImage(file, 'items');
+                    itemPhotos.push(uploadedImage);
+                }
+            }
         }
-      }
-      
-      return {
-        itemName: item.itemName,
-        serialNo: item.serialNo,
-        itemCategory: item.itemCategory,
-        itemReturnable: item.itemReturnable === true || 
-                       item.itemReturnable === 'true' || 
-                       item.itemReturnable === 'Yes' || 
-                       item.itemReturnable === 'yes',
-        itemQuantity: parseInt(item.itemQuantity || item.qty) || 1,
-        itemModel: item.itemModel,
-        itemPhotos: itemPhotos
-      };
+
+        return {
+            itemName: item.itemName,
+            serialNo: item.serialNo,
+            itemCategory: item.itemCategory,
+            itemReturnable: item.itemReturnable === true ||
+                item.itemReturnable === 'true' ||
+                item.itemReturnable === 'Yes' ||
+                item.itemReturnable === 'yes',
+            itemQuantity: parseInt(item.itemQuantity || item.qty) || 1,
+            itemModel: item.itemModel,
+            itemPhotos: itemPhotos
+        };
     }));
-  };
+};
 
 
 const getRequests = async (req, res) => {
@@ -189,7 +189,7 @@ const getRequestByEmployeeServiceNo = async (req, res) => {
             return res.status(404).json({ message: 'No requests found' });
         }
         res.json(requests);
-    }catch (error) {
+    } catch (error) {
         res.status(500).json({ message: error.message });
     }
 };
@@ -198,7 +198,7 @@ const getRequestByEmployeeServiceNo = async (req, res) => {
 const updateRequest = async (req, res) => {
     try {
         const { items, outLocation, inLocation, executiveOfficerName, receiverAvailable, receiverServiceNo } = req.body;
-        
+
         // Handle item photos upload for updated items
         const parsedItems = JSON.parse(items);
         const processedItems = await Promise.all(parsedItems.map(async (item, index) => {
@@ -340,7 +340,25 @@ const updateExecutiveOfficer = async (req, res) => {
     }
 };
 
+const cancelRequest = async (req, res) => {
+    try {
+        const { referenceNumber } = req.params;
 
+        const request = await Request.findOneAndUpdate(
+            { referenceNumber, status: 1 },
+            { status: 13, show: false },
+            { new: true }
+        );
+
+        if (!request) {
+            return res.status(404).json({ message: 'Request not found or cannot be canceled' });
+        }
+
+        res.json({ message: 'Request canceled successfully', request });
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};
 
 module.exports = {
     createRequest,
@@ -353,5 +371,6 @@ module.exports = {
     getRequestsByStatus,
     getRequestsByItemReturnable,
     getRequestsByReceiverAvailable,
-    updateExecutiveOfficer
+    updateExecutiveOfficer,
+    cancelRequest
 };

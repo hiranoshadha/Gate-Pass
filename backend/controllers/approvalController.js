@@ -1,4 +1,4 @@
-const Status = require("../models/Status"); 
+const Status = require("../models/Status");
 
 // Create a new status
 const createStatus = async (req, res) => {
@@ -23,16 +23,17 @@ const createStatus = async (req, res) => {
 
 
 const getPending = async (req, res) => {
-  const serviceNo  = req.params.id;
-  
+  const serviceNo = req.params.id;
+
   try {
     const pendingStatuses = await Status.find({ executiveOfficerStatus: 1 })
       .populate('request')
       .exec();
 
-    const filteredPending = pendingStatuses.filter(status => status.request?.executiveOfficerServiceNo === serviceNo);
-   
-    
+    const filteredPending = pendingStatuses.filter(status => status.request?.executiveOfficerServiceNo === serviceNo &&
+      status.request?.show === true);
+
+
     res.status(200).json(filteredPending);
   } catch (error) {
     console.error("Error fetching pending statuses:", error);
@@ -47,7 +48,11 @@ const getApproved = async (req, res) => {
       .populate('request')
       .exec();
 
-    res.status(200).json(approvedRequests);
+    const filteredApproved = approvedRequests.filter(status =>
+      status.request?.show === true
+    );
+
+    res.status(200).json(filteredApproved);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -56,9 +61,12 @@ const getApproved = async (req, res) => {
 const getRejected = async (req, res) => {
   try {
     const rejectedRequests = await Status.find({ executiveOfficerStatus: 3 })
-    .populate('request')
-    .exec();
-    res.status(200).json(rejectedRequests);
+      .populate('request')
+      .exec();
+    const filteredRejected = rejectedRequests.filter(status =>
+      status.request?.show === true
+    );
+    res.status(200).json(filteredRejected);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -120,27 +128,27 @@ const updateApproved = async (req, res) => {
 
 const updateRejected = async (req, res) => {
   try {
-    const {comment} = req.body;
+    const { comment } = req.body;
     const updatedStatus = await Status.findOneAndUpdate(
-      { referenceNumber: req.params.referenceNumber, executiveOfficerStatus: 1},
+      { referenceNumber: req.params.referenceNumber, executiveOfficerStatus: 1 },
       {
         // afterStatus: 3,
         // comment: comment,
         executiveOfficerStatus: 3,
-        executiveOfficerComment: comment, 
+        executiveOfficerComment: comment,
       },
       { new: true }
     ).populate("request");
     if (!updatedStatus)
-      return res.status(404).json({ message: "Status not found" }); 
+      return res.status(404).json({ message: "Status not found" });
 
-    if (updatedStatus.request){
+    if (updatedStatus.request) {
       updatedStatus.request.status = 3;
       await updatedStatus.request.save();
     }
 
     res.status(200).json(updatedStatus);
-  }catch (error) {
+  } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };

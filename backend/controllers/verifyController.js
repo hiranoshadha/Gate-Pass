@@ -1,4 +1,4 @@
-const Status = require("../models/Status"); 
+const Status = require("../models/Status");
 
 // Create a new status
 const createStatus = async (req, res) => {
@@ -24,11 +24,13 @@ const createStatus = async (req, res) => {
 
 const getPending = async (req, res) => {
   try {
-    const pendingStatuses = await Status.find({ verifyOfficerStatus: 1})
+    const pendingStatuses = await Status.find({ verifyOfficerStatus: 1 })
       .populate('request')
       .exec();
-    
-    res.status(200).json(pendingStatuses);
+    const filteredPending = pendingStatuses.filter(status =>
+      status.request?.show === true
+    );
+    res.status(200).json(filteredPending);
   } catch (error) {
     console.error("Error fetching pending statuses:", error);
     res.status(500).json({ message: "Server error" });
@@ -40,8 +42,10 @@ const getApproved = async (req, res) => {
     const approvedRequests = await Status.find({ verifyOfficerStatus: 2 })
       .populate('request')
       .exec();
-
-    res.status(200).json(approvedRequests);
+    const filteredApproved = approvedRequests.filter(status =>
+      status.request?.show === true
+    );
+    res.status(200).json(filteredApproved);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -50,9 +54,12 @@ const getApproved = async (req, res) => {
 const getRejected = async (req, res) => {
   try {
     const rejectedRequests = await Status.find({ verifyOfficerStatus: 3 })
-    .populate('request')
-    .exec();
-    res.status(200).json(rejectedRequests);
+      .populate('request')
+      .exec();
+    const filteredRejected = rejectedRequests.filter(status =>
+      status.request?.show === true
+    );
+    res.status(200).json(filteredRejected);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -64,7 +71,7 @@ const updateApproved = async (req, res) => {
     const { referenceNumber } = req.params;
     //console.log("loding details:",req.body.loadingDetails);
     //console.log("userDetails:", userServiceNumber);
-    
+
     // Update existing status
     const updatedStatus = await Status.findOneAndUpdate(
       { referenceNumber },
@@ -118,25 +125,25 @@ const updateApproved = async (req, res) => {
 
 const updateRejected = async (req, res) => {
   try {
-    const {comment} = req.body;
+    const { comment } = req.body;
     const updatedStatus = await Status.findOneAndUpdate(
-      { referenceNumber: req.params.referenceNumber},
+      { referenceNumber: req.params.referenceNumber },
       {
         verifyOfficerStatus: 3,
-        verifyOfficerComment: comment, 
+        verifyOfficerComment: comment,
       },
       { new: true }
     ).populate("request");
     if (!updatedStatus)
-      return res.status(404).json({ message: "Status not found" }); 
+      return res.status(404).json({ message: "Status not found" });
 
-    if (updatedStatus.request){
+    if (updatedStatus.request) {
       updatedStatus.request.status = 6;
       await updatedStatus.request.save();
     }
 
     res.status(200).json(updatedStatus);
-  }catch (error) {
+  } catch (error) {
     res.status(400).json({ error: error.message });
   }
 };
